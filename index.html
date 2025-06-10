@@ -478,8 +478,86 @@
     <script>
         // Data storage
         let currentUser = null;
+        
+        // Initialize with demo data if localStorage is empty
         let employees = JSON.parse(localStorage.getItem('employees') || '[]');
         let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+        
+        // Add demo employees if none exist
+        if (employees.length === 0) {
+            employees = [
+                {
+                    id: 1001,
+                    name: 'John Smith',
+                    email: 'john@company.com',
+                    password: 'john123',
+                    department: 'Marketing',
+                    role: 'employee'
+                },
+                {
+                    id: 1002,
+                    name: 'Sarah Johnson',
+                    email: 'sarah@company.com',
+                    password: 'sarah123',
+                    department: 'Sales',
+                    role: 'employee'
+                },
+                {
+                    id: 1003,
+                    name: 'Mike Davis',
+                    email: 'mike@company.com',
+                    password: 'mike123',
+                    department: 'IT',
+                    role: 'employee'
+                },
+                {
+                    id: 1004,
+                    name: 'Lisa Wilson',
+                    email: 'lisa@company.com',
+                    password: 'lisa123',
+                    department: 'HR',
+                    role: 'employee'
+                }
+            ];
+            localStorage.setItem('employees', JSON.stringify(employees));
+        }
+        
+        // Add demo tasks if none exist
+        if (tasks.length === 0) {
+            tasks = [
+                {
+                    id: 2001,
+                    title: 'Prepare Marketing Report',
+                    description: 'Create a comprehensive marketing report for Q2 performance analysis.',
+                    assignedTo: 1001,
+                    priority: 'High',
+                    deadline: '2025-06-15',
+                    status: 'pending',
+                    createdAt: '2025-06-10'
+                },
+                {
+                    id: 2002,
+                    title: 'Update Client Database',
+                    description: 'Review and update all client contact information in the system.',
+                    assignedTo: 1002,
+                    priority: 'Medium',
+                    deadline: '2025-06-20',
+                    status: 'completed',
+                    createdAt: '2025-06-09'
+                },
+                {
+                    id: 2003,
+                    title: 'Server Maintenance',
+                    description: 'Perform scheduled maintenance on company servers.',
+                    assignedTo: 1003,
+                    priority: 'High',
+                    deadline: '2025-06-12',
+                    status: 'pending',
+                    createdAt: '2025-06-08'
+                }
+            ];
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
         
         // Initialize default boss account
         const defaultBoss = {
