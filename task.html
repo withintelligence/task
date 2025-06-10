@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .page {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .logout-btn {
+            position: absolute;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: white;
+            color: #667eea;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .login-form, .register-form {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .task-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .task-card {
+            background: #f8f9fa;
+            border-left: 5px solid #667eea;
+            padding: 20px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .task-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .task-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .task-description {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .task-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9em;
+            color: #888;
+        }
+
+        .task-status {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .employee-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .employee-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .employee-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .nav-links {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .nav-links button {
+            background: none;
+            border: 2px solid #667eea;
+            color: #667eea;
+            padding: 10px 20px;
+            margin: 0 10px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links button:hover, .nav-links button.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .complete-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .complete-btn:hover {
+            background: #218838;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .welcome-section {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .welcome-section h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .welcome-section p {
+            font-size: 1.2em;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 40px;
+        }
+
+        .welcome-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .welcome-buttons .btn {
+            width: auto;
+            min-width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Welcome Page -->
+    <div id="welcome-page" class="page active">
+        <div class="container">
+            <div class="welcome-section">
+                <h1>Task Management System</h1>
+                <p>Streamline your team's productivity with our comprehensive task management solution</p>
+                <div class="welcome-buttons">
+                    <button class="btn" onclick="showPage('login-page')">Employee Login</button>
+                    <button class="btn" onclick="showPage('boss-login-page')">Boss Login</button>
+                    <button class="btn btn-secondary" onclick="showPage('register-page')">Create Account</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Employee Login Page -->
+    <div id="login-page" class="page">
+        <div class="container">
+            <div class="login-form">
+                <h2 style="text-align: center; margin-bottom: 30px; color: #667eea;">Employee Login</h2>
+                <form onsubmit="employeeLogin(event)">
+                    <div class="form-group">
+                        <label for="employee-email">Email:</label>
+                        <input type="email" id="employee-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="employee-password">Password:</label>
+                        <input type="password" id="employee-password" required>
+                    </div>
+                    <button type="submit" class="btn">Login</button>
+                    <button type="button" class="btn btn-secondary" onclick="showPage('welcome-page')">Back</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Boss Login Page -->
+    <div id="boss-login-page" class="page">
+        <div class="container">
+            <div class="login-form">
+                <h2 style="text-align: center; margin-bottom: 30px; color: #667eea;">Boss Login</h2>
+                <form onsubmit="bossLogin(event)">
+                    <div class="form-group">
+                        <label for="boss-email">Email:</label>
+                        <input type="email" id="boss-email" value="boss@company.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="boss-password">Password:</label>
+                        <input type="password" id="boss-password" value="boss123" required>
+                    </div>
+                    <button type="submit" class="btn">Login</button>
+                    <button type="button" class="btn btn-secondary" onclick="showPage('welcome-page')">Back</button>
+                </form>
+                <p style="text-align: center; margin-top: 20px; color: #666; font-size: 0.9em;">
+                    Default: boss@company.com / boss123
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Page -->
+    <div id="register-page" class="page">
+        <div class="container">
+            <div class="register-form">
+                <h2 style="text-align: center; margin-bottom: 30px; color: #667eea;">Create Employee Account</h2>
+                <form onsubmit="registerEmployee(event)">
+                    <div class="form-group">
+                        <label for="reg-name">Full Name:</label>
+                        <input type="text" id="reg-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-email">Email:</label>
+                        <input type="email" id="reg-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-password">Password:</label>
+                        <input type="password" id="reg-password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-department">Department:</label>
+                        <input type="text" id="reg-department" required>
+                    </div>
+                    <button type="submit" class="btn">Register</button>
+                    <button type="button" class="btn btn-secondary" onclick="showPage('welcome-page')">Back</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Employee Dashboard -->
+    <div id="employee-dashboard" class="page">
+        <div class="header">
+            <h1>My Tasks</h1>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+        <div class="content">
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="total-tasks">0</div>
+                    <div>Total Tasks</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="pending-tasks">0</div>
+                    <div>Pending Tasks</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="completed-tasks">0</div>
+                    <div>Completed Tasks</div>
+                </div>
+            </div>
+            <div id="employee-tasks"></div>
+        </div>
+    </div>
+
+    <!-- Boss Dashboard -->
+    <div id="boss-dashboard" class="page">
+        <div class="header">
+            <h1>Boss Dashboard</h1>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+        <div class="content">
+            <div class="nav-links">
+                <button class="active" onclick="showBossSection('assign-task')">Assign Task</button>
+                <button onclick="showBossSection('view-tasks')">View All Tasks</button>
+                <button onclick="showBossSection('manage-employees')">Manage Employees</button>
+            </div>
+
+            <!-- Assign Task Section -->
+            <div id="assign-task-section" class="boss-section">
+                <h3 style="margin-bottom: 20px;">Assign New Task</h3>
+                <form onsubmit="assignTask(event)" style="max-width: 600px;">
+                    <div class="form-group">
+                        <label for="task-title">Task Title:</label>
+                        <input type="text" id="task-title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="task-description">Task Description:</label>
+                        <textarea id="task-description" rows="4" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="assign-to">Assign To:</label>
+                        <select id="assign-to" required>
+                            <option value="">Select Employee</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="task-priority">Priority:</label>
+                        <select id="task-priority" required>
+                            <option value="Low">Low</option>
+                            <option value="Medium" selected>Medium</option>
+                            <option value="High">High</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="task-deadline">Deadline:</label>
+                        <input type="date" id="task-deadline" required>
+                    </div>
+                    <button type="submit" class="btn">Assign Task</button>
+                </form>
+            </div>
+
+            <!-- View Tasks Section -->
+            <div id="view-tasks-section" class="boss-section" style="display: none;">
+                <h3 style="margin-bottom: 20px;">All Tasks</h3>
+                <div id="all-tasks"></div>
+            </div>
+
+            <!-- Manage Employees Section -->
+            <div id="manage-employees-section" class="boss-section" style="display: none;">
+                <h3 style="margin-bottom: 20px;">Manage Employees</h3>
+                <div id="employees-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data storage
+        let currentUser = null;
+        let employees = JSON.parse(localStorage.getItem('employees') || '[]');
+        let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+        
+        // Initialize default boss account
+        const defaultBoss = {
+            email: 'boss@company.com',
+            password: 'boss123',
+            name: 'Boss',
+            role: 'boss'
+        };
+
+        // Page navigation
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        // Boss section navigation
+        function showBossSection(sectionId) {
+            document.querySelectorAll('.boss-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            document.querySelectorAll('.nav-links button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.getElementById(sectionId + '-section').style.display = 'block';
+            event.target.classList.add('active');
+            
+            if (sectionId === 'assign-task') {
+                loadEmployeeOptions();
+            } else if (sectionId === 'view-tasks') {
+                loadAllTasks();
+            } else if (sectionId === 'manage-employees') {
+                loadEmployeesList();
+            }
+        }
+
+        // Employee registration
+        function registerEmployee(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('reg-name').value;
+            const email = document.getElementById('reg-email').value;
+            const password = document.getElementById('reg-password').value;
+            const department = document.getElementById('reg-department').value;
+            
+            // Check if email already exists
+            if (employees.find(emp => emp.email === email)) {
+                alert('Email already exists!');
+                return;
+            }
+            
+            const newEmployee = {
+                id: Date.now(),
+                name: name,
+                email: email,
+                password: password,
+                department: department,
+                role: 'employee'
+            };
+            
+            employees.push(newEmployee);
+            localStorage.setItem('employees', JSON.stringify(employees));
+            
+            alert('Account created successfully!');
+            showPage('welcome-page');
+            
+            // Clear form
+            document.getElementById('reg-name').value = '';
+            document.getElementById('reg-email').value = '';
+            document.getElementById('reg-password').value = '';
+            document.getElementById('reg-department').value = '';
+        }
+
+        // Employee login
+        function employeeLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('employee-email').value;
+            const password = document.getElementById('employee-password').value;
+            
+            const employee = employees.find(emp => emp.email === email && emp.password === password);
+            
+            if (employee) {
+                currentUser = employee;
+                showPage('employee-dashboard');
+                loadEmployeeTasks();
+            } else {
+                alert('Invalid email or password!');
+            }
+        }
+
+        // Boss login
+        function bossLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('boss-email').value;
+            const password = document.getElementById('boss-password').value;
+            
+            if (email === defaultBoss.email && password === defaultBoss.password) {
+                currentUser = defaultBoss;
+                showPage('boss-dashboard');
+                loadEmployeeOptions();
+            } else {
+                alert('Invalid boss credentials!');
+            }
+        }
+
+        // Logout
+        function logout() {
+            currentUser = null;
+            showPage('welcome-page');
+        }
+
+        // Load employee tasks
+        function loadEmployeeTasks() {
+            const employeeTasks = tasks.filter(task => task.assignedTo === currentUser.id);
+            const tasksContainer = document.getElementById('employee-tasks');
+            
+            // Update stats
+            document.getElementById('total-tasks').textContent = employeeTasks.length;
+            document.getElementById('pending-tasks').textContent = employeeTasks.filter(t => t.status === 'pending').length;
+            document.getElementById('completed-tasks').textContent = employeeTasks.filter(t => t.status === 'completed').length;
+            
+            tasksContainer.innerHTML = '';
+            
+            if (employeeTasks.length === 0) {
+                tasksContainer.innerHTML = '<p style="text-align: center; color: #666; margin-top: 40px;">No tasks assigned yet.</p>';
+                return;
+            }
+            
+            const tasksGrid = document.createElement('div');
+            tasksGrid.className = 'task-grid';
+            
+            employeeTasks.forEach(task => {
+                const taskCard = document.createElement('div');
+                taskCard.className = 'task-card';
+                
+                taskCard.innerHTML = `
+                    <div class="task-title">${task.title}</div>
+                    <div class="task-description">${task.description}</div>
+                    <div class="task-meta">
+                        <span>Priority: ${task.priority}</span>
+                        <span>Due: ${task.deadline}</span>
+                    </div>
+                    <div style="margin-top: 15px; display: flex; justify-content: space-between; align-items: center;">
+                        <span class="task-status ${task.status === 'completed' ? 'status-completed' : 'status-pending'}">
+                            ${task.status.charAt(0).toUpperCase() + task.status.slice(1)}
+                        </span>
+                        ${task.status === 'pending' ? 
+                            `<button class="complete-btn" onclick="completeTask(${task.id})">Mark Complete</button>` : 
+                            ''
+                        }
+                    </div>
+                `;
+                
+                tasksGrid.appendChild(taskCard);
+            });
+            
+            tasksContainer.appendChild(tasksGrid);
+        }
+
+        // Complete task
+        function completeTask(taskId) {
+            const task = tasks.find(t => t.id === taskId);
+            if (task) {
+                task.status = 'completed';
+                localStorage.setItem('tasks', JSON.stringify(tasks));
+                loadEmployeeTasks();
+            }
+        }
+
+        // Load employee options for task assignment
+        function loadEmployeeOptions() {
+            const select = document.getElementById('assign-to');
+            select.innerHTML = '<option value="">Select Employee</option>';
+            
+            employees.forEach(employee => {
+                const option = document.createElement('option');
+                option.value = employee.id;
+                option.textContent = `${employee.name} (${employee.department})`;
+                select.appendChild(option);
+            });
+        }
+
+        // Assign task
+        function assignTask(event) {
+            event.preventDefault();
+            
+            const title = document.getElementById('task-title').value;
+            const description = document.getElementById('task-description').value;
+            const assignedTo = parseInt(document.getElementById('assign-to').value);
+            const priority = document.getElementById('task-priority').value;
+            const deadline = document.getElementById('task-deadline').value;
+            
+            const newTask = {
+                id: Date.now(),
+                title: title,
+                description: description,
+                assignedTo: assignedTo,
+                priority: priority,
+                deadline: deadline,
+                status: 'pending',
+                createdAt: new Date().toISOString().split('T')[0]
+            };
+            
+            tasks.push(newTask);
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+            
+            alert('Task assigned successfully!');
+            
+            // Clear form
+            document.getElementById('task-title').value = '';
+            document.getElementById('task-description').value = '';
+            document.getElementById('assign-to').value = '';
+            document.getElementById('task-priority').value = 'Medium';
+            document.getElementById('task-deadline').value = '';
+        }
+
+        // Load all tasks for boss view
+        function loadAllTasks() {
+            const container = document.getElementById('all-tasks');
+            container.innerHTML = '';
+            
+            if (tasks.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #666; margin-top: 40px;">No tasks created yet.</p>';
+                return;
+            }
+            
+            const tasksGrid = document.createElement('div');
+            tasksGrid.className = 'task-grid';
+            
+            tasks.forEach(task => {
+                const employee = employees.find(emp => emp.id === task.assignedTo);
+                const taskCard = document.createElement('div');
+                taskCard.className = 'task-card';
+                
+                taskCard.innerHTML = `
+                    <div class="task-title">${task.title}</div>
+                    <div class="task-description">${task.description}</div>
+                    <div class="task-meta">
+                        <span>Assigned to: ${employee ? employee.name : 'Unknown'}</span>
+                        <span>Priority: ${task.priority}</span>
+                    </div>
+                    <div class="task-meta" style="margin-top: 10px;">
+                        <span>Created: ${task.createdAt}</span>
+                        <span>Due: ${task.deadline}</span>
+                    </div>
+                    <div style="margin-top: 15px;">
+                        <span class="task-status ${task.status === 'completed' ? 'status-completed' : 'status-pending'}">
+                            ${task.status.charAt(0).toUpperCase() + task.status.slice(1)}
+                        </span>
+                    </div>
+                `;
+                
+                tasksGrid.appendChild(taskCard);
+            });
+            
+            container.appendChild(tasksGrid);
+        }
+
+        // Load employees list for boss
+        function loadEmployeesList() {
+            const container = document.getElementById('employees-list');
+            container.innerHTML = '';
+            
+            if (employees.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #666; margin-top: 40px;">No employees registered yet.</p>';
+                return;
+            }
+            
+            const employeesGrid = document.createElement('div');
+            employeesGrid.className = 'employee-list';
+            
+            employees.forEach(employee => {
+                const employeeTasks = tasks.filter(task => task.assignedTo === employee.id);
+                const completedTasks = employeeTasks.filter(task => task.status === 'completed');
+                
+                const employeeCard = document.createElement('div');
+                employeeCard.className = 'employee-card';
+                
+                employeeCard.innerHTML = `
+                    <h4 style="margin-bottom: 10px; color: #333;">${employee.name}</h4>
+                    <p style="color: #666; margin-bottom: 5px;">${employee.email}</p>
+                    <p style="color: #666; margin-bottom: 15px;">${employee.department}</p>
+                    <div style="font-size: 0.9em; color: #888;">
+                        <div>Total Tasks: ${employeeTasks.length}</div>
+                        <div>Completed: ${completedTasks.length}</div>
+                        <div>Pending: ${employeeTasks.length - completedTasks.length}</div>
+                    </div>
+                `;
+                
+                employeesGrid.appendChild(employeeCard);
+            });
+            
+            container.appendChild(employeesGrid);
+        }
+
+        // Set minimum date for task deadline to today
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            const deadlineInput = document.getElementById('task-deadline');
+            if (deadlineInput) {
+                deadlineInput.min = today;
+            }
+        });
+    </script>
+</body>
+</html>
